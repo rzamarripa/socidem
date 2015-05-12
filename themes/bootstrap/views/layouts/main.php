@@ -42,7 +42,8 @@
     rel="apple-touch-startup-image">
     <link href="<?php echo Yii::app()->theme->baseUrl . '/img/splash/iphone.png';?>" media="screen and (max-device-width: 320px)" rel="apple-touch-startup-image">
     <script src="<?php echo Yii::app()->theme->baseUrl . '/js/jquery.min.js';?>"></script>
-    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		
+
   </head>
 
   <body class="">
@@ -238,7 +239,9 @@
 			<script src="<?php echo Yii::app()->theme->baseUrl . '/js/notificaciones.js';?>"></script>
 			
 			<!-- FULL CALENDAR -->
+						<script src="<?php echo Yii::app()->theme->baseUrl . '/js/moment.min.js';?>"></script>
 			<script src="<?php echo Yii::app()->theme->baseUrl . '/js/fullcalendar.min.js';?>"></script>
+			<script src="<?php echo Yii::app()->theme->baseUrl . '/js/es.js';?>"></script>
 			<script src="<?php echo Yii::app()->theme->baseUrl . '/js/jquery-ui.custom.min.js';?>"></script>			
 			 
 			<!-- JARVIS WIDGETS -->
@@ -249,6 +252,8 @@
 			 
 			<!-- SPARKLINES -->
 			<script src="<?php echo Yii::app()->theme->baseUrl . '/js/plugin/sparkline/jquery.sparkline.min.js';?>"></script>
+
+
 			 
 			<!-- JQUERY VALIDATE -->
 			<script src="<?php echo Yii::app()->theme->baseUrl . '/js/plugin/jquery-validate/jquery.validate.min.js';?>"></script>
@@ -301,23 +306,38 @@
 					  height: 150,
 				  });
 				  
-				  
-				  var date = new Date();
+				  //Calendario
+				  /*var date = new Date();
 					var d = date.getDate();
 					var m = date.getMonth();
 					var y = date.getFullYear();
-				  var calendar = $('#calendar').fullCalendar({
+					
+				  $('#calendar').fullCalendar({					  
+					  timezone: "local",
+					  droppable: true, // this allows things to be dropped onto the calendar						
+					  disableResizing: true,
+						defaultView: 'agendaDay',
+						allDaySlot:false,
+						slotDuration:'00:20:00',
 				  	height: 700,
+				  	hiddenDays:[0],
+				  	minTime:"09:00:00",
+				  	maxTime:"21:00:00",
+						axisFormat: 'H:mm',
 					  header: {
-				      left: 'prev, next today',
+				      left: 'prev next today',
 				      center: 'title',
-				      right: 'month, basicWeek, basicDay'
-				    },
-						events: "<?php echo Yii::app()->createUrl('evento/geteventos'); ?>",
+				      right: 'month, agendaWeek, agendaDay'
+				    },				    
+						events: {
+							url:"<?php echo Yii::app()->createUrl('evento/geteventos'); ?>" ,							
+						},
 						selectable: true,
 						selectHelper: true,
-						select: function(start, end, allDay) {
-						 $('#myModal').modal('show');						 
+						select: function(start, end) {
+						 $("#Evento_fechaInicio_ft").val(moment(start).format('YYYY-MM-DD h:mm'));
+						 $("#Evento_fechaFin_ft").val(moment(end).format('YYYY-MM-DD h:mm'));
+						 $('#myModal').modal('show');
 						},
 						eventRender: function(event, element) {		
 							element.bind('dblclick', function() {
@@ -339,7 +359,7 @@
 										});
 									}	
 					    });					
-		          element.qtip({
+		         /* element.qtip({
 		            content: {
 		            	text:event.tip
 		            },
@@ -351,12 +371,174 @@
 						    }
 
 		        	});
-		        },
-						editable: false,						
-				  });
+		       	},
+						editable: true,
+				    eventDrop: function(event, delta, revertFunc) {
+				        if (!confirm("Está seguro que quiere mover la cita?")) {
+				            revertFunc();
+				        }else{
+					        $.ajax({
+										url: '<?php echo Yii::app()->createUrl("evento/update"); ?>',
+										data: {'id_':event.id, 'fechaInicio_ft':event.start.format(), 'fechaFin_ft':event.end.format()},
+										type: "POST", 
+										success: function(json) { 
+											 $.smallBox({
+												title : "Movió una cita",
+												content : "Se movió la cita correctamente",
+												color : "#739E73",
+												iconSmall : "fa fa-thumbs-up bounce animated",
+												timeout : 4000
+											});
+											history.go(0);
+										} 
+									});
+				        }
+				    },
+				    drop: function(date, jsEvent, ui) {
+							var doctor = ui.helper.context;
+
+							var fechaInicio = new Date(date.format());
+							var fechaFin = new Date(fechaInicio);							
+							fechaFin.setTime(fechaInicio.getTime() + (20 * 60 * 1000));
+							$("#Evento_fechaInicio_ft").val(moment(fechaInicio).format('YYYY-MM-DD h:mm'));
+							$("#Evento_fechaFin_ft").val(moment(fechaFin).format('YYYY-MM-DD h:mm'));
+							$('#myModal').modal('show');							
+						},
+						eventClick: function(calEvent, jsEvent, view) {
+
+				        /*alert('Event: ' + calEvent.id);
+				        alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+				        alert('View: ' + view.name);
+								
+								$('#evento').popover('show');
+				        // change the border color just for fun
+				        $(this).css('border-color', 'red');
+				
+				    }
+				  });*/
+				  $('#calendar').fullCalendar({
+			
+			        
+			        buttonText: {
+			            prev: '<i class="fa fa-chevron-left"></i>',
+			            next: '<i class="fa fa-chevron-right"></i>'
+			        },
+			
+			        editable: true,
+			        droppable: true, // this allows things to be dropped onto the calendar !!!
+			
+			        drop: function (date, allDay) { // this function is called when something is dropped
+			
+			            // retrieve the dropped element's stored Event Object
+			            var originalEventObject = $(this).data('eventObject');
+			
+			            // we need to copy it, so that multiple events don't have a reference to the same object
+			            var copiedEventObject = $.extend({}, originalEventObject);
+			
+			            // assign it the date that was reported
+			            copiedEventObject.start = date;
+			            copiedEventObject.allDay = allDay;
+			
+			            // render the event on the calendar
+			            // the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
+			            $('#calendar').fullCalendar('renderEvent', copiedEventObject, true);
+			
+			            // is the "remove after drop" checkbox checked?
+			            if ($('#drop-remove').is(':checked')) {
+			                // if so, remove the element from the "Draggable Events" list
+			                $(this).remove();
+			            }
+			
+			        },
+			
+			        select: function (start, end, allDay) {
+			            var title = prompt('Event Title:');
+			            if (title) {
+			                calendar.fullCalendar('renderEvent', {
+			                        title: title,
+			                        start: start,
+			                        end: end,
+			                        allDay: allDay
+			                    }, true // make the event "stick"
+			                );
+			            }
+			            calendar.fullCalendar('unselect');
+			        },
+			
+			        events: {
+								url:"<?php echo Yii::app()->createUrl('evento/geteventos'); ?>" ,							
+							},
+			
+			        eventRender: function (event, element, icon) {
+			            if (!event.description == "") {
+			                element.find('.fc-event-title').append("<br/><span class='ultra-light'>" + event.description +
+			                    "</span>");
+			            }
+			            if (!event.icon == "") {
+			                element.find('.fc-event-title').append("<i class='air air-top-right fa " + event.icon +
+			                    " '></i>");
+			            }
+			        },
+			
+			        windowResize: function (event, ui) {
+			            $('#calendar').fullCalendar('render');
+			        }
+			    });
+			
+			    /* hide default buttons */
+			    $('.fc-header-right, .fc-header-center').hide();
+
+			
+					$('#calendar-buttons #btn-prev').click(function () {
+					    $('.fc-button-prev').click();
+					    return false;
+					});
+					
+					$('#calendar-buttons #btn-next').click(function () {
+					    $('.fc-button-next').click();
+					    return false;
+					});
+					
+					$('#calendar-buttons #btn-today').click(function () {
+					    $('.fc-button-today').click();
+					    return false;
+					});
+					
+					$('#mt').click(function () {
+					    $('#calendar').fullCalendar('changeView', 'month');
+					});
+					
+					$('#ag').click(function () {
+					    $('#calendar').fullCalendar('changeView', 'agendaWeek');
+					});
+					
+					$('#td').click(function () {
+					    $('#calendar').fullCalendar('changeView', 'agendaDay');
+					});			
+		
+			
+		
+		
+		});
 				  
-				  					  
-				});
+				  
+				  //Estos son los médicos del panel de la izquierda
+				  /*$('#external-events').each(function() {
+						// store data so the calendar knows to render an event upon drop
+						$(this).data('event', {
+							title: $.trim($(this).text()), // use the element's text as the event title
+							stick: true, // maintain when user navigates (see docs on the renderEvent method)
+							duration: '00:20:00',
+						});
+						// make the event draggable using jQuery UI
+						$(this).draggable({
+							zIndex: 999,
+							revert: true,      // will cause the event to go back to its
+							revertDuration: 0,  //  original position after the drag
+							
+						});
+					});		*/		  
+				
 				
 			</script>
 			<?php 

@@ -80,28 +80,28 @@
 	<div class="form-group">
 		<?php echo $form->labelEx($model,'sintomas',array('class'=>'control-label col-lg-2')); ?>
 		<div class="col-lg-3">
-			<?php echo $form->textArea($model,'sintomas',array('rows'=>6, 'cols'=>50, 'class'=>'summernote')); ?>
+			<?php echo $form->textArea($model,'sintomas',array('rows'=>6, 'cols'=>50, 'class'=>'')); ?>
 			<?php echo $form->error($model,'sintomas'); ?>
 		</div>
 	</div>
 	<div class="form-group">
 		<?php echo $form->labelEx($model,'diagnostico',array('class'=>'control-label col-lg-2')); ?>
 		<div class="col-lg-3">
-			<?php echo $form->textArea($model,'diagnostico',array('rows'=>6, 'cols'=>50, 'class'=>'summernote')); ?>
+			<?php echo $form->textArea($model,'diagnostico',array('rows'=>6, 'cols'=>50, 'class'=>'')); ?>
 			<?php echo $form->error($model,'diagnostico'); ?>
 		</div>
 	</div>
 	<div class="form-group">
 		<?php echo $form->labelEx($model,'tratamiento',array('class'=>'control-label col-lg-2')); ?>
 		<div class="col-lg-3">
-			<?php echo $form->textArea($model,'tratamiento',array('rows'=>6, 'cols'=>50, 'class'=>'summernote')); ?>
+			<?php echo $form->textArea($model,'tratamiento',array('rows'=>6, 'cols'=>50, 'class'=>'')); ?>
 			<?php echo $form->error($model,'tratamiento'); ?>
 		</div>
 	</div>
 	<div class="form-group">
 		<?php echo $form->labelEx($model,'notas',array('class'=>'control-label col-lg-2')); ?>
 		<div class="col-lg-3">
-			<?php echo $form->textArea($model,'notas',array('rows'=>6, 'cols'=>50, 'class'=>'summernote')); ?>
+			<?php echo $form->textArea($model,'notas',array('rows'=>6, 'cols'=>50, 'class'=>'')); ?>
 			<?php echo $form->error($model,'notas'); ?>
 		</div>
 	</div>

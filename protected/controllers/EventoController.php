@@ -97,24 +97,30 @@ class EventoController extends Controller
 	 */
 	public function actionUpdate()
 	{	
-		$model=$this->loadModel($_POST["id"]);
 		
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-
-		if(isset($_POST['id']))
-		{
+		if(isset($_POST["id"])){
+			$model=$this->loadModel($_POST["id"]);
 			$model->nombre=$_POST['title'];
 			$model->fechaInicio_ft=$_POST['start'];
 			$model->fechaFin_ft=$_POST['end'];
 			$model->estatus_did = 1;
-			if($model->save())
-				$this->redirect(array('index'));
+		}else{
+			$model=$this->loadModel($_POST["id_"]);
+			$model->fechaInicio_ft=$_POST['fechaInicio_ft'];
+			$model->fechaFin_ft=$_POST['fechaFin_ft'];
+			$model->estatus_did = 1;
 		}
+		
+		if($model->save())
+				$this->redirect(array('index'));
+		// Uncomment the following line if AJAX validation is needed
+		// $this->performAjaxValidation($model);
+		
 	}
 	
 	public function actionActualizar($id)
 	{	
+		
 		$model=$this->loadModel($id);
 		$usuarioActual = Usuario::model()->obtenerUsuarioActual();
 		// Uncomment the following line if AJAX validation is needed
@@ -149,6 +155,7 @@ class EventoController extends Controller
 	public function actionIndex()
 	{
 		$model = new Evento;
+
 		if(isset($_POST["Evento"]))
 		{
 			$usuarioActual = Usuario::model()->obtenerUsuarioActual();
@@ -157,15 +164,18 @@ class EventoController extends Controller
 			}
 			$model->attributes = $_POST["Evento"];			
 			$model->estatus_did = 1;
+
 			if($model->save()){
 				Yii::app()->user->setFlash("info","Se agregó la cita: " . $model->id . " al paciente: " . $model->paciente->nombre . " " . $model->paciente->apellidos . ".");
 				$this->redirect(array("index"));
 			}
 		}else{
+			$medicos = Usuario::model()->findAll("tipoUsuario_did >= 3");
 			$dataProvider=new CActiveDataProvider('Evento');
 			$this->render('index',array(
 				'dataProvider'=>$dataProvider,
-				'model'=>$model
+				'model'=>$model,
+				'medicos'=>$medicos,
 			));
 		}
 		
@@ -240,10 +250,11 @@ class EventoController extends Controller
 		$cursor = Evento::model()->findAll("estatus_did = 1 order by fechaInicio_ft asc");
 		foreach ($cursor as $valor)	
 			$result[]=Array('id' => $valor->id,
-											'title' => $valor->paciente->nombre . " " . $valor->paciente->apellidos . " - " . $valor->usuario->nombre . " - " . date("d-m-Y H:i A", strtotime($valor->fechaInicio_ft)),
+											'title' => $valor->paciente->nombre . " " . $valor->paciente->apellidos ,
 			                'start' => $valor->fechaInicio_ft,
  			                'end' => $valor->fechaFin_ft,
 			                'description' => $valor->descripcion,
+			                'acciones'=> CHtml::link("Prueba",array(),array("class"=>"btn btn-sm")),
 			                'tip' => '<strong>' . $valor->paciente->nombre . " " . $valor->paciente->apellidos . "</strong><br/>" . 
 			                					$valor->descripcion . "<br/>".
 			                					"<strong>Inicia :</strong> " . date("d-m-Y H:i A", strtotime($valor->fechaInicio_ft)) . "<br/>".

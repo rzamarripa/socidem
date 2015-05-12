@@ -111,10 +111,10 @@ return array(
 		
 	
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=demomedico',
+			'connectionString' => 'mysql:host=localhost;dbname=medicos',
 			'emulatePrepare' => true,
-			'username' => 'rzamarripa',
-			'password' => 'Zamarripa83',
+			'username' => 'root',
+			'password' => 'root',
 			'enableProfiling' => true,
 			'charset' => 'utf8',
 		),
